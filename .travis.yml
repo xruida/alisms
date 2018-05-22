@@ -1,0 +1,16 @@
+language: go
+
+os:
+  - linux
+  - osx
+
+go:
+  - tip
+  - "1.10"
+
+install:
+  - go get github.com/issue9/assert
+
+script: go test -v -coverprofile=coverage.txt -covermode=atomic $(go list ./...| grep -v /vendor/)
+
+after_success: bash <(curl -s https://codecov.io/bash)
