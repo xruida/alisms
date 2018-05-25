@@ -82,13 +82,12 @@ func (sms *AliSMS) Send(tplID, param, signname string, number ...string) (*Reque
 
 	url := HTTPSendURL + "?" + signstr
 
-	client := &http.Client{}
 	reqd, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := client.Do(reqd)
+	resp, err := http.DefaultClient.Do(reqd)
 	if err != nil {
 		return nil, err
 	}

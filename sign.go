@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+var replacer = strings.NewReplacer("+", "%20", "*", "%2A", "%7E", "~")
+
 //Sign 签名方法
 func Sign(apikey string, params map[string]string) (string, error) {
 	/* 排序 */
@@ -62,12 +64,5 @@ func Sign(apikey string, params map[string]string) (string, error) {
 
 func specialURLEncode(str string) string {
 	str = url.QueryEscape(str)
-
-	str = strings.Replace(str, "+", "%20", -1)
-
-	str = strings.Replace(str, "*", "%2A", -1)
-
-	str = strings.Replace(str, "%7E", "~", -1)
-
-	return str
+	return replacer.Replace(str)
 }
