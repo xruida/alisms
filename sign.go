@@ -12,8 +12,8 @@ import (
 
 var replacer = strings.NewReplacer("+", "%20", "*", "%2A", "%7E", "~")
 
-//Sign 签名方法
-func Sign(apikey string, params map[string]string) (string, error) {
+// 签名方法
+func sign(apikey string, params map[string]string) (string, error) {
 	/* 排序 */
 	keys := make([]string, 0, len(params))
 	for k := range params {

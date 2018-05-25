@@ -5,16 +5,6 @@
 // Package alisms 阿里云短信服务 SDK
 package alisms
 
-import (
-	"encoding/json"
-	"io/ioutil"
-	"math/rand"
-	"net/http"
-	"strconv"
-	"strings"
-	"time"
-)
-
 // 签名信息
 const (
 	SignatureMethod  = "HMAC-SHA1"
@@ -42,68 +32,4 @@ func New(keyid, secret string) *AliSMS {
 		AccessKeyID:  keyid,
 		AccessSecret: secret,
 	}
-}
-
-// Send 发送短信
-func (sms *AliSMS) Send(tplID, param, signname string, number ...string) (*Request, error) {
-	req := &BodyRequest{}
-
-	//处理批量号码
-	req.PhoneNumbers = strings.Join(number, ",")
-	req.Timestamp = time.Now().UTC().Format("2006-01-02T15:04:05Z")
-	req.SignName = signname
-	req.TemplateCode = tplID
-	req.TemplateParam = param
-
-	//提交参数列表
-
-	params := map[string]string{}
-
-	params["Timestamp"] = req.Timestamp
-	params["AccessKeyId"] = sms.AccessKeyID
-	params["SignatureMethod"] = SignatureMethod
-	params["SignatureVersion"] = SignatureVersion
-	rand.Seed(time.Now().Unix())
-	rnd := rand.Int()
-	params["SignatureNonce"] = strconv.Itoa(rnd)
-	params["RegionId"] = RegionID
-	params["Version"] = Version
-	params["Action"] = Action
-	params["Format"] = "JSON"
-	params["PhoneNumbers"] = req.PhoneNumbers
-	params["SignName"] = req.SignName
-	params["TemplateCode"] = req.TemplateCode
-	params["TemplateParam"] = req.TemplateParam
-
-	signstr, err := Sign(sms.AccessSecret, params)
-	if err != nil {
-		return nil, err
-	}
-
-	url := HTTPSendURL + "?" + signstr
-
-	reqd, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := http.DefaultClient.Do(reqd)
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	relust := new(Request)
-
-	if err := json.Unmarshal(body, relust); err != nil {
-		return nil, err
-	}
-
-	return relust, nil
 }
